@@ -29,7 +29,7 @@ class Up1D(nn.Module):
 
 		self.c1 = nn.ConvTranspose1d(in_channel, out_channel, kernel_size=kernel, stride=stride, padding=kernel/2 )
 		nn.init.orthogonal_(self.c1.weight)
-		drop = nn.Dropout(p=0.5)
+		self.drop = nn.Dropout(p=0.5)
 
 
 	def forward(self, x):
@@ -46,7 +46,7 @@ class Bottleneck(nn.Module):
 
 		self.c1 = nn.Conv1d(in_channel, out_channel, kernel_size=kernel, stride=stride, padding=kernel/2 )
 		nn.init.orthogonal_(self.c1.weight)
-		drop = nn.Dropout(p=0.5)
+		self.drop = nn.Dropout(p=0.5)
 
 
 	def forward(self, x):
@@ -78,7 +78,7 @@ class AudioUnet(nn.Module):
 		down_outs = [x]
 		for i in range(num_layers):
 			down_outs.append(self.downsample[i](down_outs[i]))
-		x1 = self.bottlebeck(down_outs[-1])
+		x1 = self.bottleneck(down_outs[-1])
 		for i, d in zip(range(num_layers), reversed(down_outs[1:])):
 			x1 = self.upsample[i](x1)
 			x1 = torch.cat([x1, down_outs[i]]) #concat axis =-1 for tf
